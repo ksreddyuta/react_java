@@ -26,15 +26,24 @@ const AddressList = ({ customer, onRefresh }) => {
   const [open, setOpen] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [apiError, setApiError] = useState('');
 
   const handleDelete = async () => {
     try {
-      await deleteAddress(deleteConfirm.id);
+      const response = await deleteAddress(deleteConfirm.id);
+      
+      // Check if API returned an error
+      if (response.errorCode && response.errorCode !== 'SUCCESS') {
+        setApiError(response.errorMessage || 'Failed to delete address');
+        return;
+      }
+      
       setDeleteConfirm(null);
+      setApiError('');
       if (onRefresh) onRefresh();
     } catch (error) {
       console.error('Error deleting address:', error);
-      alert('Error deleting address: ' + error.message);
+      setApiError('Error deleting address: ' + error.message);
     }
   };
 
@@ -43,7 +52,7 @@ const AddressList = ({ customer, onRefresh }) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">
           Addresses
-          {customer.numAddresses === 1 && (
+          {customer.addresses.length === 1 && (
             <Chip 
               label="Only One Address" 
               color="primary" 
@@ -61,9 +70,15 @@ const AddressList = ({ customer, onRefresh }) => {
         </Button>
       </Box>
 
-      {customer.numAddresses === 1 && (
+      {apiError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {apiError}
+        </Alert>
+      )}
+
+      {customer.addresses.length === 1 && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          This customer has only one address. Adding at least one more address will allow customer deletion.
+          This customer has only one address. It cannot be deleted.
         </Alert>
       )}
 
@@ -96,11 +111,11 @@ const AddressList = ({ customer, onRefresh }) => {
                   </IconButton>
                   <IconButton 
                     onClick={() => setDeleteConfirm(address)}
-                    disabled={customer.numAddresses === 1}
+                    disabled={customer.addresses.length === 1}
                     sx={{ 
-                      opacity: customer.numAddresses === 1 ? 0.5 : 1,
+                      opacity: customer.addresses.length === 1 ? 0.5 : 1,
                       '&:hover': {
-                        backgroundColor: customer.numAddresses === 1 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
+                        backgroundColor: customer.addresses.length === 1 ? 'transparent' : 'rgba(0, 0, 0, 0.04)'
                       }
                     }}
                   >
@@ -134,7 +149,7 @@ const AddressList = ({ customer, onRefresh }) => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           Are you sure you want to delete this address?
-          {customer.numAddresses === 1 && (
+          {customer.addresses.length === 1 && (
             <Typography variant="body2" color="error" sx={{ mt: 1 }}>
               This is the only address for this customer and cannot be deleted.
             </Typography>
@@ -145,7 +160,7 @@ const AddressList = ({ customer, onRefresh }) => {
           <Button 
             onClick={handleDelete} 
             color="error"
-            disabled={customer.numAddresses === 1}
+            disabled={customer.addresses.length === 1}
           >
             Delete
           </Button>

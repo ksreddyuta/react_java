@@ -24,8 +24,15 @@ const CustomerDetail = ({ customerId, onBack, onRefresh }) => {
   const fetchCustomer = useCallback(async () => {
     try {
       setLoading(true);
-      const customerData = await getCustomerById(customerId);
-      setCustomer(customerData);
+      const response = await getCustomerById(customerId);
+      
+      // Check if API returned an error
+      if (response.errorCode && response.errorCode !== 'SUCCESS') {
+        setError(response.errorMessage || 'Failed to fetch customer details');
+        return;
+      }
+      
+      setCustomer(response);
       setError('');
     } catch (err) {
       setError('Failed to fetch customer details: ' + err.message);
@@ -65,9 +72,9 @@ const CustomerDetail = ({ customerId, onBack, onRefresh }) => {
         Back to List
       </Button>
 
-      {customer.numAddresses === 1 && (
+      {customer.addresses.length === 1 && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          This customer has only one address and cannot be deleted.
+          This customer has only one address. It cannot be deleted.
         </Alert>
       )}
 
@@ -81,7 +88,7 @@ const CustomerDetail = ({ customerId, onBack, onRefresh }) => {
             <Typography><strong>Email:</strong> {customer.email}</Typography>
             <Typography><strong>Phone:</strong> {customer.phone}</Typography>
             <Typography><strong>Created:</strong> {new Date(customer.createdAt).toLocaleDateString()}</Typography>
-            {customer.numAddresses === 1 && (
+            {customer.addresses.length === 1 && (
               <Chip 
                 label="Only One Address" 
                 color="primary" 
