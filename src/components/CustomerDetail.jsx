@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -7,14 +7,55 @@ import {
   Grid,
   Dialog,
   Chip,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import CustomerForm from './CustomerForm';
 import AddressList from './AddressList';
+import { getCustomerById } from '../services/api';
 
-const CustomerDetail = ({ customer, onBack, onRefresh }) => {
+const CustomerDetail = ({ customerId, onBack, onRefresh }) => {
+  const [customer, setCustomer] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const fetchCustomer = useCallback(async () => {
+    try {
+      setLoading(true);
+      const customerData = await getCustomerById(customerId);
+      setCustomer(customerData);
+      setError('');
+    } catch (err) {
+      setError('Failed to fetch customer details: ' + err.message);
+      console.error('Error fetching customer:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [customerId]);
+
+  useEffect(() => {
+    if (customerId) {
+      fetchCustomer();
+    }
+  }, [customerId, fetchCustomer]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
+    );
+  }
 
   if (!customer) return null;
 
@@ -60,13 +101,17 @@ const CustomerDetail = ({ customer, onBack, onRefresh }) => {
         </Grid>
       </Paper>
 
-      <AddressList customer={customer} onRefresh={onRefresh} />
+      <AddressList customer={customer} onRefresh={() => {
+        fetchCustomer();
+        if (onRefresh) onRefresh();
+      }} />
 
       <Dialog open={editMode} onClose={() => setEditMode(false)} maxWidth="md" fullWidth>
         <CustomerForm
           customer={customer}
           onClose={() => {
             setEditMode(false);
+            fetchCustomer();
             if (onRefresh) onRefresh();
           }}
         />

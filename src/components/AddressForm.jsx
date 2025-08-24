@@ -129,7 +129,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               name="street"
@@ -142,7 +142,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
               required
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               name="street2"
@@ -152,7 +152,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
               onBlur={handleBlur}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               name="city"
@@ -165,7 +165,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               name="state"
@@ -178,7 +178,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               name="pincode"
@@ -191,7 +191,7 @@ const AddressForm = ({ open, customerId, address, onClose }) => {
               required
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               name="country"

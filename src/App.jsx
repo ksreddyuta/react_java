@@ -1,30 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Alert } from '@mui/material';
+import React, { useState } from 'react';
+import { Container, Typography } from '@mui/material';
 import CustomerList from './components/CustomerList';
 import CustomerDetail from './components/CustomerDetail';
-import { getAllCustomers } from './services/api';
 import './App.css';
 
 function App() {
-  // eslint-disable-next-line no-unused-vars
-  const [customers, setCustomers] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [view, setView] = useState('list');
-  const [error, setError] = useState('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+  const handleSelectCustomer = (customer) => {
+    setSelectedCustomerId(customer.id);
+    setView('detail');
+  };
 
-  const fetchCustomers = async () => {
-    try {
-      const data = await getAllCustomers();
-      setCustomers(data);
-      setError('');
-    } catch (err) {
-      setError('Failed to fetch customers: ' + err.message);
-      console.error('Error fetching customers:', err);
-    }
+  const handleBack = () => {
+    setSelectedCustomerId(null);
+    setView('list');
+  };
+
+  const refreshData = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -32,26 +28,17 @@ function App() {
       <Typography variant="h3" gutterBottom align="center">
         Customer Management System
       </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
       
       {view === 'list' ? (
         <CustomerList
-          onSelectCustomer={(customer) => {
-            setSelectedCustomer(customer);
-            setView('detail');
-          }}
-          onRefresh={fetchCustomers}
+          onSelectCustomer={handleSelectCustomer}
+          refreshTrigger={refreshTrigger}
         />
       ) : (
         <CustomerDetail
-          customer={selectedCustomer}
-          onBack={() => setView('list')}
-          onRefresh={fetchCustomers}
+          customerId={selectedCustomerId}
+          onBack={handleBack}
+          onRefresh={refreshData}
         />
       )}
     </Container>

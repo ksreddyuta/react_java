@@ -126,7 +126,7 @@ const CustomerForm = ({ open, customer, onClose }) => {
       <DialogContent>
         <Box sx={{ mt: 2 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 name="firstName"
@@ -139,7 +139,7 @@ const CustomerForm = ({ open, customer, onClose }) => {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 name="lastName"
@@ -152,7 +152,7 @@ const CustomerForm = ({ open, customer, onClose }) => {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 name="email"
@@ -166,7 +166,7 @@ const CustomerForm = ({ open, customer, onClose }) => {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 name="phone"
